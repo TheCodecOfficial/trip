@@ -14,7 +14,9 @@ export function Today({ trip, date, setDate }: { trip: TripData; date: string; s
   const total = daysBetween(start, end) + 1
   const entries = entriesFor(trip, date)
   const isToday = date === today
-  const nextEntry = isToday ? entries.find((e) => e.at !== undefined && e.at > now) : undefined
+  const upcoming = isToday ? entries.filter((e) => e.at !== undefined && e.at > now) : []
+  // Highlight the next train/ticket rather than a check-in/out deadline.
+  const nextEntry = upcoming.find((e) => e.item.type !== 'stay') ?? upcoming[0]
   const tonight = stayFor(trip, date)
   const checkinToday = entries.some((e) => e.role === 'checkin')
   const todos = todosFor(trip.todos, date)

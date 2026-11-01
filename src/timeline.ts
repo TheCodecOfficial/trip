@@ -17,31 +17,45 @@ export const isTransport = (i: Item) => i.type === 'train' || i.type === 'bus' |
 
 export function entriesFor(trip: TripData, date: string): Entry[] {
   const out: (Entry & { sort: number })[] = []
+  // Untimed items keep their place in the plan: right after the entry before them (or the morning check-out).
+  const checkout = trip.items.find((i): i is Stay => i.type === 'stay' && i.until === date)
+  let prev = checkout ? (minutes(checkout.checkOut) ?? 10 * 60) : 0
   for (const item of trip.items) {
     if (item.type === 'stay') {
       if (item.date === date) out.push(entry(item, 'checkin', date, item.checkIn, 15 * 60))
       if (item.until === date) out.push(entry(item, 'checkout', date, item.checkOut, 10 * 60))
       continue
     }
+    let e
     if (item.date === date) {
       const time = item.type === 'activity' ? item.start : item.from.time
-      out.push(entry(item, 'event', date, time, 24 * 60, isTransport(item) ? item.from.tz : undefined))
+      e = entry(item, 'event', date, time, prev + 0.01, isTransport(item) ? item.from.tz : undefined)
     } else if (isTransport(item) && item.to.date === date) {
       // Overnight transport: show the arrival on the next day too.
-      out.push(entry(item, 'arrive', date, item.to.time, 0, item.to.tz))
+      e = entry(item, 'arrive', date, item.to.time, prev + 0.01, item.to.tz)
+    }
+    if (e) {
+      out.push(e)
+      prev = e.sort
     }
   }
-  // Check-in times are "from" times: you get there after the day's last arrival.
-  const lastArrival = Math.max(
-    -1,
-    ...out.filter((e) => e.role === 'event' && isTransport(e.item)).map((e) => arrivalMinutes(e.item, date) ?? -1),
-  )
+
+  const legs = out.filter((e) => e.role !== 'checkin' && e.role !== 'checkout' && isTransport(e.item))
+  // Check-out times are deadlines: you leave before the day's first departure.
+  const first = legs.filter((e) => e.role === 'event').sort((a, b) => a.sort - b.sort)[0]
   for (const e of out) {
-    if (e.role !== 'checkin' || lastArrival < e.sort) continue
-    e.sort = lastArrival + 1
-    e.at = toMs(date, `${Math.floor(lastArrival / 60)}:${String(lastArrival % 60).padStart(2, '0')}`)
+    if (e.role !== 'checkout' || !first || first.sort > e.sort) continue
+    e.sort = first.sort - 0.5
+    if (first.at !== undefined) e.at = first.at
   }
-  // Check-outs before other things at the same time; untimed things last.
+  // Check-in times are "from" times: you get there after the day's last leg.
+  const lastSort = Math.max(-1, ...legs.map((e) => (e.role === 'event' ? (arrivalMinutes(e.item, date) ?? e.sort) : e.sort)))
+  const lastArrival = Math.max(-1, ...legs.map((e) => arrivalMinutes(e.item, date) ?? -1))
+  for (const e of out) {
+    if (e.role !== 'checkin' || lastSort < e.sort) continue
+    e.sort = lastSort + 0.5
+    if (lastArrival >= 0) e.at = toMs(date, `${Math.floor(lastArrival / 60)}:${String(lastArrival % 60).padStart(2, '0')}`)
+  }
   const roleOrder: Record<Role, number> = { checkout: 0, arrive: 1, event: 2, checkin: 3 }
   return out.sort((a, b) => a.sort - b.sort || roleOrder[a.role] - roleOrder[b.role])
 }
