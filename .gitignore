@@ -1,0 +1,14 @@
+# --- Private trip data: NEVER commit ---
+/data/
+/sources/
+*.eml
+*.yaml.bak
+.env
+.env.*
+
+# Build output / deps
+/dist/
+/dev-dist/
+node_modules/
+*.log
+.DS_Store
