@@ -20,6 +20,17 @@ type Tab = (typeof tabs)[number][0]
 const readTab = (): Tab => tabs.find(([t]) => `#${t}` === location.hash)?.[0] ?? 'today'
 
 export function App() {
+  return (
+    <>
+      <Screen />
+      {/* Mounted in every phase (also while locked) so the app is cached for offline use on the first visit. */}
+      <UpdatePrompt />
+      <Toaster />
+    </>
+  )
+}
+
+function Screen() {
   const state = useStore()
   const [tab, setTabState] = useState<Tab>(readTab)
   const [date, setDate] = useState<string>()
@@ -81,8 +92,6 @@ export function App() {
           </button>
         ))}
       </nav>
-      <UpdatePrompt />
-      <Toaster />
     </>
   )
 }
