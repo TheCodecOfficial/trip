@@ -1,0 +1,208 @@
+# FICTIONAL example data. It documents the format of data/trip.yaml and is used for development.
+# The real trip lives in data/trip.yaml (gitignored) and only ships encrypted (public/trip.enc).
+
+trip:
+  title: Example Trip
+  start: 2027-04-01
+  end: 2027-04-07
+  homeCurrency: CHF
+  jpyPerHome: 172 # ¥ per 1 CHF
+
+days:
+  2027-04-01: { city: Departure }
+  2027-04-02: { city: Tokyo }
+  2027-04-03: { city: Tokyo }
+  2027-04-04: { city: Tokyo → Kyoto }
+  2027-04-05: { city: Kyoto, note: Early start for Fushimi Inari before the crowds. }
+  2027-04-06: { city: Kyoto → Hiroshima → Tokyo }
+  2027-04-07: { city: Return }
+
+items:
+  - id: flight-out
+    type: flight
+    date: 2027-04-01
+    status: booked
+    service: XX 160
+    operator: Example Air
+    from: { place: Zurich (ZRH), time: "13:05", tz: "+02:00", detail: Terminal E }
+    to: { place: Tokyo Haneda (HND), placeJa: 羽田空港, time: "08:40", date: 2027-04-02, detail: Terminal 3 }
+    confirmation: ABC123
+    baggage: 1 × 23 kg checked, 8 kg cabin
+    links:
+      - { label: Online check-in, url: "https://example.com/checkin" }
+
+  - id: stay-tokyo
+    type: stay
+    date: 2027-04-02
+    until: 2027-04-04
+    name: Hotel Example Asakusa
+    address: 1-2-3 Asakusa, Taito-ku, Tokyo 111-0032
+    addressJa: 〒111-0032 東京都台東区浅草1-2-3
+    phone: "+81 3-0000-0000"
+    checkIn: "15:00"
+    checkOut: "10:00"
+    confirmation: "1234.567.890"
+    pin: "4321"
+    payment: Paid via booking.com
+    mapsUrl: "https://maps.google.com/?q=Asakusa"
+    links:
+      - { label: booking.com, url: "https://secure.booking.com/myreservations.html" }
+
+  - id: museum-teamlab
+    type: activity
+    date: 2027-04-03
+    name: Digital Art Museum
+    start: "10:30"
+    end: "11:00"
+    notes: Time slot = entry window. Shoes may need to come off; wear shorts or roll up trousers.
+    ticketUrl: "https://example.com/tickets/xyz"
+    place: Toyosu
+    mapsUrl: "https://maps.google.com/?q=Toyosu"
+
+  - id: ghibli
+    type: activity
+    date: 2027-04-03
+    name: Animation Museum
+    start: "16:00"
+    status: booked
+    notes: Bring passport, the name on the ticket must match.
+    ticketUrl: "https://example.com/tickets/abc"
+    confirmation: GH-998877
+
+  - id: shinkansen-tokyo-kyoto
+    type: train
+    date: 2027-04-04
+    status: booked
+    service: Nozomi 21
+    from: { place: Tokyo, placeJa: 東京, time: "10:00", detail: Platform 14–19 (check board) }
+    to: { place: Kyoto, placeJa: 京都, time: "12:14" }
+    class: Reserved
+    car: "7"
+    seat: 12-E (Fuji side)
+    bookedVia: smartex
+    ticketForm: ic
+    confirmation: "1234"
+    price: ¥14,170
+
+  - id: stay-kyoto
+    type: stay
+    date: 2027-04-04
+    until: 2027-04-06
+    name: Machiya Example Kyoto
+    address: 456 Example-cho, Shimogyo-ku, Kyoto
+    addressJa: 京都府京都市下京区例町456
+    checkIn: "16:00–22:00"
+    checkOut: "11:00"
+    confirmation: "9876.543.210"
+    payment: "Pay at property: ¥38,000 (cash only)"
+    notes: Key box code is sent by email on the day of arrival.
+
+  - id: fushimi
+    type: activity
+    date: 2027-04-05
+    name: Fushimi Inari
+    start: "07:00"
+    status: planned
+    notes: No ticket needed. JR Nara line to Inari station (IC card).
+
+  - id: train-kyoto-hiroshima
+    type: train
+    date: 2027-04-06
+    status: pickup-needed
+    service: Nozomi 3
+    from: { place: Kyoto, placeJa: 京都, time: "08:16" }
+    to: { place: Hiroshima, placeJa: 広島, time: "10:01" }
+    class: Reserved
+    car: "5"
+    seat: 3-A
+    bookedVia: e5489
+    ticketForm: credit-card
+    confirmation: "E-5555"
+
+  - id: bus-miyajima
+    type: bus
+    date: 2027-04-06
+    status: buy-on-site
+    title: Ferry + bus to Miyajima
+    from: { place: Hiroshima Station, time: "10:30" }
+    to: { place: Miyajimaguchi }
+    notes: Pay with IC card.
+
+  - id: flight-hij-hnd
+    type: flight
+    date: 2027-04-06
+    status: booked
+    service: XX 678
+    operator: Example Domestic
+    from: { place: Hiroshima (HIJ), time: "18:40" }
+    to: { place: Tokyo Haneda (HND), time: "20:05", detail: Terminal 1 }
+    confirmation: XYZ789
+    baggage: 20 kg checked
+    notes: Limousine bus from Hiroshima station takes ~50 min. Leave by 16:45.
+
+  - id: stay-haneda
+    type: stay
+    date: 2027-04-06
+    until: 2027-04-07
+    name: Airport Hotel Example
+    checkIn: "15:00"
+    checkOut: "11:00"
+    confirmation: "1111.222.333"
+    payment: Paid
+
+  - id: flight-home
+    type: flight
+    date: 2027-04-07
+    service: XX 161
+    operator: Example Air
+    from: { place: Tokyo Haneda (HND), time: "10:30", detail: Terminal 3 }
+    to: { place: Zurich (ZRH), time: "17:15", tz: "+02:00" }
+    confirmation: ABC123
+
+ticketGuides:
+  smartex:
+    name: smartEX
+    summary: Ticketless. The booking is linked to your IC card; just tap through the shinkansen gate.
+    steps:
+      - Tap the linked IC card at the shinkansen transfer/entry gate.
+      - Take the seat slip that the gate prints.
+      - Changes are possible in the app before departure.
+    url: "https://smart-ex.jp/en/"
+  e5489:
+    name: e5489 (JR West)
+    summary: The ticket is tied to the credit card used for booking. Pick it up at a JR West ticket machine.
+    steps:
+      - At a JR West ticket machine, choose to pick up a reserved ticket.
+      - Insert the same credit card used for booking.
+      - Collect all tickets (base fare + express) and put both into the gate.
+    url: "https://www.westjr.co.jp/global/en/"
+
+accounts:
+  - { name: Visit Japan Web, url: "https://vjw-lp.digital.go.jp/en/", note: Immigration + customs QR codes }
+  - { name: smartEX, url: "https://smart-ex.jp/en/", note: Tokaido shinkansen, guide: smartex }
+  - { name: e5489, url: "https://www.westjr.co.jp/global/en/", note: JR West reservations, guide: e5489 }
+  - { name: booking.com, url: "https://secure.booking.com/myreservations.html" }
+
+todos:
+  - { id: todo-vjw, text: Fill in Visit Japan Web and screenshot both QR codes }
+  - { id: todo-esim, text: Install eSIM }
+  - { id: todo-cash, text: Withdraw cash at 7-Eleven ATM, date: 2027-04-02 }
+  - { id: todo-pickup, text: Pick up e5489 tickets in Kyoto (JR West machine), date: 2027-04-05, itemId: train-kyoto-hiroshima }
+  - { id: todo-luggage, text: Book luggage forwarding at hotel front desk, date: 2027-04-03 }
+
+emergency:
+  - { name: Police, phone: "110" }
+  - { name: Ambulance / Fire, phone: "119" }
+  - { name: "Japan Visitor Hotline (24h, English)", phone: "+81-50-3816-2787" }
+  - { name: Example Embassy Tokyo, phone: "+81 3-0000-0000", note: Fictional }
+  - { name: Travel insurance, phone: "+41 00 000 00 00", note: "Policy 0000-0000 (fictional)" }
+
+info:
+  - title: IC card
+    body: |
+      Mobile Suica on the phone / physical card.
+      - Top up at any convenience store or station machine.
+      - Works for trains, buses, konbini and lockers.
+  - title: Tax-free
+    body: |
+      Show your passport when paying. Minimum ¥5,000 per shop per day.
